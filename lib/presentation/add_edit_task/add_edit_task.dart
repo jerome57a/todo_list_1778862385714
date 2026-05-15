@@ -14,7 +14,8 @@ class AddEditTask extends StatefulWidget {
 }
 
 class _AddEditTaskState extends State<AddEditTask> {
-  final bool _hasUnsavedChanges = false;
+  // FIXED: Removed "final" keyword so this boolean can be updated when the user types
+  bool _hasUnsavedChanges = false;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +101,7 @@ class _AddEditTaskState extends State<AddEditTask> {
 
     _triggerHapticFeedback();
 
+    // Passing the saved task back to the previous screen
     Navigator.of(context).pop(normalizedTask);
   }
 
@@ -249,10 +251,8 @@ class _AddEditTaskState extends State<AddEditTask> {
   }
 
   void _deleteTask() {
-    // Simulate task deletion
     _showSuccessMessage('Task deleted successfully!');
-
-    // Navigate back to dashboard
+    // Pass {deleted: true} back so the dashboard knows to remove it from the list
     Navigator.of(context).pop({'deleted': true});
   }
 }

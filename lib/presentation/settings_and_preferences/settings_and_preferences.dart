@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
-import './widgets/account_section_widget.dart';
-import './widgets/appearance_section_widget.dart';
 import './widgets/language_section_widget.dart';
 import './widgets/notifications_section_widget.dart';
 import './widgets/privacy_section_widget.dart';
@@ -16,21 +14,12 @@ class SettingsAndPreferences extends StatefulWidget {
 }
 
 class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
-  // Appearance settings
-  bool _isDarkMode = false;
-  String _selectedThemeColor = "blue";
-
   // Notification settings
   bool _dueDateReminders = true;
   bool _overdueTaskAlerts = true;
   bool _dailySummary = false;
-  TimeOfDay _quietHoursStart = TimeOfDay(hour: 22, minute: 0);
-  TimeOfDay _quietHoursEnd = TimeOfDay(hour: 7, minute: 0);
-
-  // Account settings
-  String _syncStatus = "Synced";
-  DateTime _lastSyncTime = DateTime.now().subtract(Duration(minutes: 15));
-  final String _storageUsed = "2.3 MB";
+  TimeOfDay _quietHoursStart = const TimeOfDay(hour: 22, minute: 0);
+  TimeOfDay _quietHoursEnd = const TimeOfDay(hour: 7, minute: 0);
 
   // Privacy settings
   bool _biometricAuth = false;
@@ -46,18 +35,12 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
       backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
             SizedBox(height: 2.h),
-            _buildUserProfileHeader(),
-            SizedBox(height: 2.h),
-            AppearanceSectionWidget(
-              isDarkMode: _isDarkMode,
-              onThemeChanged: _handleThemeChanged,
-              selectedThemeColor: _selectedThemeColor,
-              onThemeColorChanged: _handleThemeColorChanged,
-            ),
+            
+            // Notifications
             NotificationsSectionWidget(
               dueDateReminders: _dueDateReminders,
               overdueTaskAlerts: _overdueTaskAlerts,
@@ -75,15 +58,8 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
               onQuietHoursEndChanged: (time) =>
                   setState(() => _quietHoursEnd = time),
             ),
-            AccountSectionWidget(
-              syncStatus: _syncStatus,
-              lastSyncTime: _lastSyncTime,
-              storageUsed: _storageUsed,
-              onManualSync: _handleManualSync,
-              onExportData: _handleExportData,
-              onSignOut: _handleSignOut,
-              onDeleteAccount: _handleDeleteAccount,
-            ),
+            
+            // Privacy
             PrivacySectionWidget(
               biometricAuth: _biometricAuth,
               dataRetention: _dataRetention,
@@ -95,11 +71,15 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
               onAnalyticsChanged: (value) =>
                   setState(() => _analyticsEnabled = value),
             ),
+            
+            // Language
             LanguageSectionWidget(
               currentLanguage: _currentLanguage,
               onLanguageChanged: (language) =>
                   setState(() => _currentLanguage = language),
             ),
+            
+            // App Info
             _buildAppInfoSection(),
             SizedBox(height: 4.h),
           ],
@@ -137,84 +117,6 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
     );
   }
 
-  Widget _buildUserProfileHeader() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.w),
-      padding: EdgeInsets.all(4.w),
-      decoration: BoxDecoration(
-        color: AppTheme.lightTheme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppTheme.lightTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Center(
-              child: CustomIconWidget(
-                iconName: 'person',
-                color: AppTheme.lightTheme.primaryColor,
-                size: 32,
-              ),
-            ),
-          ),
-          SizedBox(width: 4.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'John Doe',
-                  style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 0.5.h),
-                Text(
-                  'john.doe@email.com',
-                  style: AppTheme.lightTheme.textTheme.bodySmall,
-                ),
-                SizedBox(height: 0.5.h),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
-                  decoration: BoxDecoration(
-                    color:
-                        AppTheme.getSuccessColor(true).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Premium Member',
-                    style: AppTheme.lightTheme.textTheme.labelSmall?.copyWith(
-                      color: AppTheme.getSuccessColor(true),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          CustomIconWidget(
-            iconName: 'edit',
-            color: AppTheme.lightTheme.colorScheme.onSurface,
-            size: 20,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildAppInfoSection() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
@@ -223,9 +125,9 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -321,155 +223,6 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
     );
   }
 
-  void _handleThemeChanged(bool isDark) {
-    setState(() => _isDarkMode = isDark);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            CustomIconWidget(
-              iconName: isDark ? 'dark_mode' : 'light_mode',
-              color: Colors.white,
-              size: 20,
-            ),
-            SizedBox(width: 2.w),
-            Text('${isDark ? 'Dark' : 'Light'} theme applied'),
-          ],
-        ),
-        backgroundColor: AppTheme.lightTheme.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  void _handleThemeColorChanged(String color) {
-    setState(() => _selectedThemeColor = color);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            CustomIconWidget(
-              iconName: 'palette',
-              color: Colors.white,
-              size: 20,
-            ),
-            SizedBox(width: 2.w),
-            Text(
-                'Theme color updated to ${color[0].toUpperCase()}${color.substring(1)}'),
-          ],
-        ),
-        backgroundColor: AppTheme.lightTheme.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  Future<void> _handleManualSync() async {
-    setState(() {
-      _syncStatus = "Syncing";
-      _lastSyncTime = DateTime.now();
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-            SizedBox(width: 2.w),
-            Text('Syncing data...'),
-          ],
-        ),
-        backgroundColor: AppTheme.lightTheme.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() => _syncStatus = "Synced");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              CustomIconWidget(
-                iconName: 'check_circle',
-                color: Colors.white,
-                size: 20,
-              ),
-              SizedBox(width: 2.w),
-              Text('Sync completed successfully!'),
-            ],
-          ),
-          backgroundColor: AppTheme.getSuccessColor(true),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
-    }
-  }
-
-  void _handleExportData() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            CustomIconWidget(
-              iconName: 'download',
-              color: Colors.white,
-              size: 20,
-            ),
-            SizedBox(width: 2.w),
-            Text('Data export started...'),
-          ],
-        ),
-        backgroundColor: AppTheme.getSuccessColor(true),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  void _handleSignOut() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/',
-      (route) => false,
-    );
-  }
-
-  void _handleDeleteAccount() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            CustomIconWidget(
-              iconName: 'warning',
-              color: Colors.white,
-              size: 20,
-            ),
-            SizedBox(width: 2.w),
-            Text('Account deletion initiated'),
-          ],
-        ),
-        backgroundColor: AppTheme.lightTheme.colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
   void _showHelpDialog() {
     showDialog(
       context: context,
@@ -482,7 +235,7 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
               size: 24,
             ),
             SizedBox(width: 2.w),
-            Text('Help & Support'),
+            const Text('Help & Support'),
           ],
         ),
         content: Column(
@@ -505,19 +258,19 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close'),
+            child: const Text('Close'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Opening support center...'),
+                  content: const Text('Opening support center...'),
                   backgroundColor: AppTheme.lightTheme.primaryColor,
                 ),
               );
             },
-            child: Text('Get Help'),
+            child: const Text('Get Help'),
           ),
         ],
       ),
@@ -528,11 +281,11 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Send Feedback'),
+        title: const Text('Send Feedback'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
+            const TextField(
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Tell us what you think about TaskFlow Pro...',
@@ -542,13 +295,13 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
             SizedBox(height: 2.h),
             Row(
               children: [
-                CustomIconWidget(
+                const CustomIconWidget(
                   iconName: 'star',
                   color: Colors.amber,
                   size: 20,
                 ),
                 SizedBox(width: 1.w),
-                Text('Rate your experience:'),
+                const Text('Rate your experience:'),
               ],
             ),
             SizedBox(height: 1.h),
@@ -559,7 +312,7 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
                   onTap: () {},
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 1.w),
-                    child: CustomIconWidget(
+                    child: const CustomIconWidget(
                       iconName: 'star_border',
                       color: Colors.amber,
                       size: 24,
@@ -573,19 +326,19 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Thank you for your feedback!'),
+                  content: const Text('Thank you for your feedback!'),
                   backgroundColor: AppTheme.getSuccessColor(true),
                 ),
               );
             },
-            child: Text('Send'),
+            child: const Text('Send'),
           ),
         ],
       ),
@@ -597,13 +350,13 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
       SnackBar(
         content: Row(
           children: [
-            CustomIconWidget(
+            const CustomIconWidget(
               iconName: 'star',
               color: Colors.white,
               size: 20,
             ),
             SizedBox(width: 2.w),
-            Text('Opening App Store...'),
+            const Text('Opening App Store...'),
           ],
         ),
         backgroundColor: AppTheme.lightTheme.primaryColor,
