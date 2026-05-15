@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../core/services/task_storage_service.dart';
 import './widgets/advanced_filter_widget.dart';
 import './widgets/filter_chips_widget.dart';
 import './widgets/recent_searches_widget.dart';
@@ -43,7 +44,7 @@ class _SearchAndFilterState extends State<SearchAndFilter> {
   @override
   void initState() {
     super.initState();
-    _initializeMockData();
+    _loadTasks();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -53,107 +54,15 @@ class _SearchAndFilterState extends State<SearchAndFilter> {
     super.dispose();
   }
 
-  void _initializeMockData() {
-    _allTasks = [
-      {
-        "id": 1,
-        "title": "Complete project proposal",
-        "description":
-            "Finalize the quarterly project proposal with budget analysis and timeline. Include stakeholder feedback and risk assessment.",
-        "dueDate": DateTime.now().add(const Duration(days: 3)),
-        "priority": "High",
-        "category": "Work",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 5)),
-        "modifiedAt": DateTime.now().subtract(const Duration(hours: 2)),
-      },
-      {
-        "id": 2,
-        "title": "Buy groceries for dinner",
-        "description":
-            "Get ingredients for pasta dinner: tomatoes, basil, parmesan cheese, and ground beef.",
-        "dueDate": DateTime.now(),
-        "priority": "Medium",
-        "category": "Shopping",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 1)),
-        "modifiedAt": DateTime.now().subtract(const Duration(minutes: 30)),
-      },
-      {
-        "id": 3,
-        "title": "Schedule dentist appointment",
-        "description":
-            "Call Dr. Smith's office to schedule routine cleaning and checkup.",
-        "dueDate": DateTime.now().add(const Duration(days: 7)),
-        "priority": "Low",
-        "category": "Health",
-        "isCompleted": true,
-        "createdAt": DateTime.now().subtract(const Duration(days: 10)),
-        "modifiedAt": DateTime.now().subtract(const Duration(days: 2)),
-      },
-      {
-        "id": 4,
-        "title": "Review quarterly budget",
-        "description":
-            "Analyze Q3 expenses and prepare budget recommendations for Q4.",
-        "dueDate": DateTime.now().subtract(const Duration(days: 2)),
-        "priority": "High",
-        "category": "Finance",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 15)),
-        "modifiedAt": DateTime.now().subtract(const Duration(days: 1)),
-      },
-      {
-        "id": 5,
-        "title": "Prepare presentation slides",
-        "description":
-            "Create slides for Monday's team meeting covering project updates and next steps.",
-        "dueDate": DateTime.now().add(const Duration(days: 1)),
-        "priority": "Medium",
-        "category": "Work",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 3)),
-        "modifiedAt": DateTime.now().subtract(const Duration(hours: 4)),
-      },
-      {
-        "id": 6,
-        "title": "Morning workout routine",
-        "description":
-            "30-minute cardio session followed by strength training focusing on upper body.",
-        "dueDate": DateTime.now().add(const Duration(days: 1)),
-        "priority": "Low",
-        "category": "Personal",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 7)),
-        "modifiedAt": DateTime.now().subtract(const Duration(hours: 12)),
-      },
-      {
-        "id": 7,
-        "title": "Update project documentation",
-        "description":
-            "Revise technical documentation and user guides for the new software release.",
-        "dueDate": DateTime.now().add(const Duration(days: 5)),
-        "priority": "Medium",
-        "category": "Work",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 8)),
-        "modifiedAt": DateTime.now().subtract(const Duration(hours: 6)),
-      },
-      {
-        "id": 8,
-        "title": "Plan weekend trip",
-        "description":
-            "Research destinations, book accommodations, and create itinerary for weekend getaway.",
-        "dueDate": DateTime.now().add(const Duration(days: 10)),
-        "priority": "Low",
-        "category": "Personal",
-        "isCompleted": false,
-        "createdAt": DateTime.now().subtract(const Duration(days: 12)),
-        "modifiedAt": DateTime.now().subtract(const Duration(days: 3)),
-      },
-    ];
-
-    _performSearch();
+  // Load real tasks from storage instead of using mock data
+  Future<void> _loadTasks() async {
+    final tasks = await TaskStorageService.instance.loadTasks();
+    if (mounted) {
+      setState(() {
+        _allTasks = tasks;
+      });
+      _performSearch();
+    }
   }
 
   void _onSearchChanged() {
@@ -182,9 +91,9 @@ class _SearchAndFilterState extends State<SearchAndFilter> {
     // Apply text search
     if (_searchQuery.isNotEmpty) {
       results = results.where((task) {
-        final title = (task['title'] as String).toLowerCase();
-        final description = (task['description'] as String).toLowerCase();
-        final category = (task['category'] as String).toLowerCase();
+        final title = (task['title'] as String?)?.toLowerCase() ?? '';
+        final description = (task['description'] as String?)?.toLowerCase() ?? '';
+        final category = (task['category'] as String?)?.toLowerCase() ?? '';
         final query = _searchQuery.toLowerCase();
 
         final titleMatch = title.contains(query);
@@ -306,15 +215,23 @@ class _SearchAndFilterState extends State<SearchAndFilter> {
       case 'priority':
         final priorityOrder = {'High': 0, 'Medium': 1, 'Low': 2};
         sorted.sort((a, b) {
-          final priorityA = priorityOrder[a['priority']] ?? 3;
-          final priorityB = priorityOrder[b['priority']] ?? 3;
+          // Changed to match your task creation logic
+          final pA = a['priority'] != null ? 
+                     a['priority'].toString().substring(0, 1).toUpperCase() + a['priority'].toString().substring(1).toLowerCase() 
+                     : 'Medium';
+          final pB = b['priority'] != null ? 
+                     b['priority'].toString().substring(0, 1).toUpperCase() + b['priority'].toString().substring(1).toLowerCase() 
+                     : 'Medium';
+                     
+          final priorityA = priorityOrder[pA] ?? 3;
+          final priorityB = priorityOrder[pB] ?? 3;
           return priorityA.compareTo(priorityB);
         });
         break;
       case 'modified':
         sorted.sort((a, b) {
-          final dateA = a['modifiedAt'] as DateTime;
-          final dateB = b['modifiedAt'] as DateTime;
+          final dateA = a['modifiedAt'] as DateTime? ?? a['updatedAt'] as DateTime? ?? DateTime.now();
+          final dateB = b['modifiedAt'] as DateTime? ?? b['updatedAt'] as DateTime? ?? DateTime.now();
           return dateB.compareTo(dateA);
         });
         break;
@@ -383,8 +300,20 @@ class _SearchAndFilterState extends State<SearchAndFilter> {
     _performSearch();
   }
 
-  void _onTaskTap(Map<String, dynamic> task) {
-    Navigator.pushNamed(context, '/add-edit-task', arguments: task);
+  void _onTaskTap(Map<String, dynamic> task) async {
+    final result = await Navigator.pushNamed(context, '/add-edit-task', arguments: task);
+    
+    if (result != null && result is Map<String, dynamic>) {
+      final tasks = await TaskStorageService.instance.loadTasks();
+      
+      if (result['deleted'] == true) {
+        await TaskStorageService.instance.deleteTask(tasks, task['id']);
+      } else {
+        await TaskStorageService.instance.updateTask(tasks, result);
+      }
+      
+      await _loadTasks(); // Reloads everything so search works right away
+    }
   }
 
   void _onToggleAdvancedFilter() {

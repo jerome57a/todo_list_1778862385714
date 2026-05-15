@@ -174,7 +174,16 @@ class _CalendarViewState extends State<CalendarView>
     Navigator.pop(context);
     final result =
         await Navigator.pushNamed(context, '/add-edit-task', arguments: task);
+    
     if (result != null && result is Map<String, dynamic>) {
+      final tasks = await TaskStorageService.instance.loadTasks();
+      
+      if (result['deleted'] == true) {
+        await TaskStorageService.instance.deleteTask(tasks, task['id']);
+      } else {
+        await TaskStorageService.instance.updateTask(tasks, result);
+      }
+      
       await _loadTasksFromStorage();
     }
   }
@@ -182,28 +191,39 @@ class _CalendarViewState extends State<CalendarView>
   void _onTaskTap(Map<String, dynamic> task) async {
     final result =
         await Navigator.pushNamed(context, '/add-edit-task', arguments: task);
+        
     if (result != null && result is Map<String, dynamic>) {
+      final tasks = await TaskStorageService.instance.loadTasks();
+      
+      if (result['deleted'] == true) {
+        await TaskStorageService.instance.deleteTask(tasks, task['id']);
+      } else {
+        await TaskStorageService.instance.updateTask(tasks, result);
+      }
+      
       await _loadTasksFromStorage();
     }
   }
 
   void _navigateToAddTaskFromSheet(DateTime? date) async {
     Navigator.pop(context);
-    final result =
-        await Navigator.pushNamed(context, '/add-edit-task', arguments: {
-      'selectedDate': date ?? _selectedDate,
-    });
-    if (result != null && result is Map<String, dynamic>) {
+    // Removed the problematic arguments so the form knows it's a NEW task
+    final result = await Navigator.pushNamed(context, '/add-edit-task');
+    
+    if (result != null && result is Map<String, dynamic> && result['deleted'] != true) {
+      final tasks = await TaskStorageService.instance.loadTasks();
+      await TaskStorageService.instance.addTask(tasks, result);
       await _loadTasksFromStorage();
     }
   }
 
   void _navigateToAddTask(DateTime? date) async {
-    final result =
-        await Navigator.pushNamed(context, '/add-edit-task', arguments: {
-      'selectedDate': date ?? _selectedDate,
-    });
-    if (result != null && result is Map<String, dynamic>) {
+    // Removed the problematic arguments so the form knows it's a NEW task
+    final result = await Navigator.pushNamed(context, '/add-edit-task');
+    
+    if (result != null && result is Map<String, dynamic> && result['deleted'] != true) {
+      final tasks = await TaskStorageService.instance.loadTasks();
+      await TaskStorageService.instance.addTask(tasks, result);
       await _loadTasksFromStorage();
     }
   }
