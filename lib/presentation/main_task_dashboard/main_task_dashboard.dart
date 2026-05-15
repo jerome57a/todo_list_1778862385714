@@ -23,8 +23,8 @@ class _MainTaskDashboardState extends State<MainTaskDashboard>
   bool _isRefreshing = false;
   bool _isLoading = true;
 
-  // User data
-  final String _userName = "Sarah Johnson";
+  // User data (Changed from Sarah Johnson)
+  final String _userName = "User";
 
   // Persistent task list
   List<Map<String, dynamic>> _tasks = [];
