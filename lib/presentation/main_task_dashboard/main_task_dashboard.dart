@@ -23,10 +23,7 @@ class _MainTaskDashboardState extends State<MainTaskDashboard>
   bool _isRefreshing = false;
   bool _isLoading = true;
 
-  // User data (Changed from Sarah Johnson)
   final String _userName = "User";
-
-  // Persistent task list
   List<Map<String, dynamic>> _tasks = [];
 
   List<Map<String, dynamic>> get _todayTasks {
@@ -150,22 +147,7 @@ class _MainTaskDashboardState extends State<MainTaskDashboard>
       setState(() => _tasks = updated);
     }
     HapticFeedback.heavyImpact();
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Task "${task['title']}" deleted'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () async {
-              final restored =
-                  await TaskStorageService.instance.addTask(_tasks, task);
-              if (mounted) setState(() => _tasks = restored);
-            },
-          ),
-        ),
-      );
-    }
+    // The pop-up notification has been entirely removed
   }
 
   void _onTaskEdit(Map<String, dynamic> task) async {

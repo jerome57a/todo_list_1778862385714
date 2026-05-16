@@ -207,7 +207,6 @@ class _CalendarViewState extends State<CalendarView>
 
   void _navigateToAddTaskFromSheet(DateTime? date) async {
     Navigator.pop(context);
-    // Removed the problematic arguments so the form knows it's a NEW task
     final result = await Navigator.pushNamed(context, '/add-edit-task');
     
     if (result != null && result is Map<String, dynamic> && result['deleted'] != true) {
@@ -218,7 +217,6 @@ class _CalendarViewState extends State<CalendarView>
   }
 
   void _navigateToAddTask(DateTime? date) async {
-    // Removed the problematic arguments so the form knows it's a NEW task
     final result = await Navigator.pushNamed(context, '/add-edit-task');
     
     if (result != null && result is Map<String, dynamic> && result['deleted'] != true) {
@@ -236,6 +234,21 @@ class _CalendarViewState extends State<CalendarView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
+      // ADDED THE BACK BUTTON HERE
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: CustomIconWidget(
+            iconName: 'arrow_back',
+            color: AppTheme.lightTheme.colorScheme.onSurface,
+            size: 24,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [

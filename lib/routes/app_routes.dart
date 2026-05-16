@@ -9,7 +9,6 @@ import '../presentation/main_task_dashboard/main_task_dashboard.dart';
 import '../presentation/add_edit_task/add_edit_task.dart';
 
 class AppRoutes {
-  // TODO: Add your routes here
   static const String initial = '/';
   static const String analyticsDashboard = '/analytics-dashboard';
   static const String splash = '/splash-screen';
@@ -29,7 +28,11 @@ class AppRoutes {
     taskListView: (context) => const TaskListView(),
     calendarView: (context) => const CalendarView(),
     mainTaskDashboard: (context) => const MainTaskDashboard(),
-    addEditTask: (context) => const AddEditTask(),
-    // TODO: Add your other routes here
+    
+    // FIX: Extract the task argument when navigating and pass it into AddEditTask
+    addEditTask: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      return AddEditTask(task: args);
+    },
   };
 }
