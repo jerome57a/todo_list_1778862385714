@@ -147,7 +147,6 @@ class _MainTaskDashboardState extends State<MainTaskDashboard>
       setState(() => _tasks = updated);
     }
     HapticFeedback.heavyImpact();
-    // The pop-up notification has been entirely removed
   }
 
   void _onTaskEdit(Map<String, dynamic> task) async {
@@ -354,7 +353,7 @@ class _MainTaskDashboardState extends State<MainTaskDashboard>
                 ),
               )
             : EmptyStateWidget(
-                title: 'Welcome to TaskFlow Pro!',
+                title: 'Welcome to Checklist App!',
                 subtitle:
                     'Start organizing your life by adding your first task. Tap the button below to get started.',
                 buttonText: 'Add Your First Task',

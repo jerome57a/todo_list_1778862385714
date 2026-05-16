@@ -239,8 +239,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   Widget _buildLogo() {
     return Container(
-      width: 25.w,
-      height: 25.w,
+      // Increased from 25.w to 38.w so the longer text fits beautifully
+      width: 38.w, 
+      height: 38.w,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -262,19 +263,19 @@ class _SplashScreenState extends State<SplashScreen>
           ),
           SizedBox(height: 1.h),
           Text(
-            'TaskFlow',
+            'To Do', // Main title changed here
             style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
               color: AppTheme.lightTheme.colorScheme.primary,
               fontWeight: FontWeight.w700,
-              fontSize: 12.sp,
+              fontSize: 14.sp,
             ),
           ),
           Text(
-            'Pro',
+            'Checklist App', // Subtitle changed here
             style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
               color: AppTheme.lightTheme.colorScheme.tertiary,
               fontWeight: FontWeight.w600,
-              fontSize: 8.sp,
+              fontSize: 10.sp,
             ),
           ),
         ],
