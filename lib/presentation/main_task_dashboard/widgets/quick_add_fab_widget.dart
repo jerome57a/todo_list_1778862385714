@@ -21,23 +21,18 @@ class _QuickAddFabWidgetState extends State<QuickAddFabWidget>
     with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
   late AnimationController _animationController;
-  late Animation<double> _expandAnimation;
   late Animation<double> _rotateAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
-    );
-    _expandAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
     );
     _rotateAnimation = Tween<double>(
       begin: 0,
-      end: 0.125, // 45 degrees
+      end: 0.125, // 45 degrees (turns + into x)
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
@@ -66,69 +61,71 @@ class _QuickAddFabWidgetState extends State<QuickAddFabWidget>
 
   void _onActionTap(VoidCallback? action) {
     _toggleExpanded();
-    Future.delayed(const Duration(milliseconds: 150), () {
+    Future.delayed(const Duration(milliseconds: 250), () {
       action?.call();
     });
     HapticFeedback.mediumImpact();
   }
 
+  // Helper widget to build perfectly aligned small FABs
+  Widget _buildSmallFab({
+    required String heroTag,
+    required String iconName,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      // Centers the 40px small FAB perfectly over the 56px main FAB
+      padding: const EdgeInsets.only(right: 8.0),
+      child: FloatingActionButton.small(
+        heroTag: heroTag,
+        onPressed: onTap,
+        backgroundColor: color,
+        elevation: 4,
+        child: CustomIconWidget(
+          iconName: iconName,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Voice Input FAB
-        AnimatedBuilder(
-          animation: _expandAnimation,
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(0, -70 * _expandAnimation.value),
-              child: Transform.scale(
-                scale: _expandAnimation.value,
-                child: Opacity(
-                  opacity: _expandAnimation.value,
-                  child: FloatingActionButton(
-                    heroTag: "voice_fab",
-                    onPressed: () => _onActionTap(widget.onVoiceInput),
-                    backgroundColor: AppTheme.lightTheme.colorScheme.tertiary,
-                    child: CustomIconWidget(
+        // FIX: Replaced SizeTransition with AnimatedSize pinned to the bottom right
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          alignment: Alignment.bottomRight,
+          child: _isExpanded
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _buildSmallFab(
+                      heroTag: "voice_fab",
                       iconName: 'mic',
-                      color: Colors.white,
-                      size: 24,
+                      color: AppTheme.lightTheme.colorScheme.tertiary,
+                      onTap: () => _onActionTap(widget.onVoiceInput),
                     ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-
-        // Quick Add FAB
-        AnimatedBuilder(
-          animation: _expandAnimation,
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(0, -140 * _expandAnimation.value),
-              child: Transform.scale(
-                scale: _expandAnimation.value,
-                child: Opacity(
-                  opacity: _expandAnimation.value,
-                  child: FloatingActionButton(
-                    heroTag: "add_fab",
-                    onPressed: () => _onActionTap(widget.onAddTask),
-                    backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-                    child: CustomIconWidget(
+                    const SizedBox(height: 16),
+                    _buildSmallFab(
+                      heroTag: "add_fab",
                       iconName: 'add',
-                      color: Colors.white,
-                      size: 24,
+                      color: AppTheme.lightTheme.colorScheme.primary,
+                      onTap: () => _onActionTap(widget.onAddTask),
                     ),
-                  ),
-                ),
-              ),
-            );
-          },
+                    const SizedBox(height: 16),
+                  ],
+                )
+              : const SizedBox.shrink(), // Takes up 0 space when hidden
         ),
-
+        
         // Main FAB
         FloatingActionButton(
           heroTag: "main_fab",
@@ -153,18 +150,6 @@ class _QuickAddFabWidgetState extends State<QuickAddFabWidget>
             },
           ),
         ),
-
-        // Backdrop
-        _isExpanded
-            ? Positioned.fill(
-                child: GestureDetector(
-                  onTap: _toggleExpanded,
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.1),
-                  ),
-                ),
-              )
-            : const SizedBox.shrink(),
       ],
     );
   }

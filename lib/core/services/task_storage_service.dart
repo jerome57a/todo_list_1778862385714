@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskStorageService {
-  static const String _tasksKey = 'tasks_data';
+  // CHANGE: We updated the key so it ignores the old saved dummy tasks and starts fresh!
+  static const String _tasksKey = 'tasks_data_v2'; 
   static TaskStorageService? _instance;
 
   TaskStorageService._();
@@ -17,15 +19,18 @@ class TaskStorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_tasksKey);
+      
+      // Return empty list if no data exists (no more dummy tasks!)
       if (jsonString == null || jsonString.isEmpty) {
-        return _getDefaultTasks();
+        return []; 
       }
+      
       final List<dynamic> decoded = jsonDecode(jsonString);
       return decoded
           .map((item) => _deserializeTask(item as Map<String, dynamic>))
           .toList();
     } catch (_) {
-      return _getDefaultTasks();
+      return [];
     }
   }
 
@@ -35,7 +40,9 @@ class TaskStorageService {
       final prefs = await SharedPreferences.getInstance();
       final serialized = tasks.map((t) => _serializeTask(t)).toList();
       await prefs.setString(_tasksKey, jsonEncode(serialized));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("Failed to save tasks: $e");
+    }
   }
 
   /// Add a single task
@@ -82,108 +89,46 @@ class TaskStorageService {
   /// Serialize a task map to JSON-safe format
   Map<String, dynamic> _serializeTask(Map<String, dynamic> task) {
     final result = Map<String, dynamic>.from(task);
-    if (result['dueDate'] is DateTime) {
-      result['dueDate'] = (result['dueDate'] as DateTime).toIso8601String();
+    
+    final dateFields = ['dueDate', 'createdAt', 'updatedAt', 'date'];
+    for (var field in dateFields) {
+      if (result[field] is DateTime) {
+        result[field] = (result[field] as DateTime).toIso8601String();
+      }
     }
-    if (result['createdAt'] is DateTime) {
-      result['createdAt'] = (result['createdAt'] as DateTime).toIso8601String();
+    
+    if (result['dueTime'] is TimeOfDay) {
+      final time = result['dueTime'] as TimeOfDay;
+      result['dueTime'] = '${time.hour}:${time.minute}';
     }
-    if (result['date'] is DateTime) {
-      result['date'] = (result['date'] as DateTime).toIso8601String();
-    }
+    
     return result;
   }
 
   /// Deserialize a task map from JSON
   Map<String, dynamic> _deserializeTask(Map<String, dynamic> task) {
     final result = Map<String, dynamic>.from(task);
-    if (result['dueDate'] is String) {
-      result['dueDate'] = DateTime.tryParse(result['dueDate'] as String);
+    
+    final dateFields = ['dueDate', 'createdAt', 'updatedAt', 'date'];
+    for (var field in dateFields) {
+      if (result[field] is String) {
+        final parsedDate = DateTime.tryParse(result[field] as String);
+        if (parsedDate != null) {
+          result[field] = parsedDate;
+        }
+      }
     }
-    if (result['createdAt'] is String) {
-      result['createdAt'] = DateTime.tryParse(result['createdAt'] as String);
+    
+    if (result['dueTime'] is String) {
+      final parts = (result['dueTime'] as String).split(':');
+      if (parts.length == 2) {
+        result['dueTime'] = TimeOfDay(
+          hour: int.tryParse(parts[0]) ?? 0,
+          minute: int.tryParse(parts[1]) ?? 0,
+        );
+      }
     }
-    if (result['date'] is String) {
-      result['date'] = DateTime.tryParse(result['date'] as String);
-    }
+    
     return result;
-  }
-
-  /// Default seed tasks (shown on first launch only)
-  List<Map<String, dynamic>> _getDefaultTasks() {
-    final now = DateTime.now();
-    return [
-      {
-        "id": 1,
-        "title": "Review quarterly reports",
-        "description":
-            "Analyze Q3 performance metrics and prepare summary for board meeting",
-        "priority": "high",
-        "category": "work",
-        "dueDate": now.add(const Duration(hours: 2)),
-        "createdAt": now.subtract(const Duration(days: 1)),
-        "isCompleted": false,
-      },
-      {
-        "id": 2,
-        "title": "Team standup meeting",
-        "description": "Daily sync with development team",
-        "priority": "medium",
-        "category": "work",
-        "dueDate": now.add(const Duration(hours: 1)),
-        "createdAt": now.subtract(const Duration(days: 1)),
-        "isCompleted": false,
-      },
-      {
-        "id": 3,
-        "title": "Grocery shopping",
-        "description": "Buy ingredients for weekend dinner party",
-        "priority": "low",
-        "category": "shopping",
-        "dueDate": now.add(const Duration(hours: 4)),
-        "createdAt": now.subtract(const Duration(days: 2)),
-        "isCompleted": false,
-      },
-      {
-        "id": 4,
-        "title": "Submit expense report",
-        "description": "Upload receipts and submit monthly expenses",
-        "priority": "high",
-        "category": "work",
-        "dueDate": now.subtract(const Duration(days: 1)),
-        "createdAt": now.subtract(const Duration(days: 3)),
-        "isCompleted": false,
-      },
-      {
-        "id": 5,
-        "title": "Call dentist",
-        "description": "Schedule routine cleaning appointment",
-        "priority": "medium",
-        "category": "personal",
-        "dueDate": now.add(const Duration(days: 2)),
-        "createdAt": now.subtract(const Duration(days: 1)),
-        "isCompleted": false,
-      },
-      {
-        "id": 6,
-        "title": "Finish project proposal",
-        "description": "Complete the client presentation slides",
-        "priority": "high",
-        "category": "work",
-        "dueDate": now.add(const Duration(days: 1)),
-        "createdAt": now.subtract(const Duration(days: 4)),
-        "isCompleted": true,
-      },
-      {
-        "id": 7,
-        "title": "Morning workout",
-        "description": "30-minute cardio session at the gym",
-        "priority": "medium",
-        "category": "health",
-        "dueDate": now.subtract(const Duration(hours: 2)),
-        "createdAt": now.subtract(const Duration(days: 1)),
-        "isCompleted": true,
-      },
-    ];
   }
 }
