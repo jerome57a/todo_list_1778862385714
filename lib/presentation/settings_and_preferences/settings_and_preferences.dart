@@ -166,7 +166,25 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
               style: AppTheme.lightTheme.textTheme.bodyLarge,
             ),
             subtitle: Text(
-              'TaskFlow Pro v2.1.0 (Build 2025.08.22)',
+              'To Do Checklist App v2.1.0 (Build 2025.08.22)',
+              style: AppTheme.lightTheme.textTheme.bodySmall,
+            ),
+          ),
+          Divider(height: 1, color: AppTheme.lightTheme.dividerColor),
+          ListTile(
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+            leading: CustomIconWidget(
+              iconName: 'code',
+              color: AppTheme.lightTheme.colorScheme.onSurface,
+              size: 24,
+            ),
+            title: Text(
+              'Developer',
+              style: AppTheme.lightTheme.textTheme.bodyLarge,
+            ),
+            subtitle: Text(
+              'jerome57a (GitHub)',
               style: AppTheme.lightTheme.textTheme.bodySmall,
             ),
           ),
@@ -184,7 +202,7 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
               style: AppTheme.lightTheme.textTheme.bodyLarge,
             ),
             subtitle: Text(
-              'Help us improve TaskFlow Pro',
+              'Help us improve To Do Checklist App',
               style: AppTheme.lightTheme.textTheme.bodySmall,
             ),
             trailing: CustomIconWidget(
@@ -243,7 +261,7 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Need help with TaskFlow Pro?',
+              'Need help with To Do Checklist App?',
               style: AppTheme.lightTheme.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
@@ -288,7 +306,7 @@ class _SettingsAndPreferencesState extends State<SettingsAndPreferences> {
             const TextField(
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: 'Tell us what you think about TaskFlow Pro...',
+                hintText: 'Tell us what you think about To Do Checklist App...',
                 border: OutlineInputBorder(),
               ),
             ),

@@ -1,7 +1,8 @@
-To Do Checklist App
+# Flutter
 
 A modern Flutter-based mobile application utilizing the latest mobile development technologies and tools for building responsive cross-platform applications.
- 📋 Prerequisites
+
+## 📋 Prerequisites
 
 - Flutter SDK (^3.29.2)
 - Dart SDK
@@ -10,22 +11,20 @@ A modern Flutter-based mobile application utilizing the latest mobile developmen
 
 ## 🛠️ Installation
 
+
 1. Install dependencies:
 ```bash
 flutter pub get
-
 ```
 
 2. Run the application:
-
 ```bash
 flutter run
-
 ```
 
 ## 📁 Project Structure
 
-```text
+```
 flutter_app/
 ├── android/            # Android-specific configuration
 ├── ios/                # iOS-specific configuration
@@ -41,7 +40,6 @@ flutter_app/
 ├── assets/             # Static assets (images, fonts, etc.)
 ├── pubspec.yaml        # Project dependencies and configuration
 └── README.md           # Project documentation
-
 ```
 
 ## 🧩 Adding Routes
@@ -62,7 +60,6 @@ class AppRoutes {
     // Add more routes as needed
   }
 }
-
 ```
 
 ## 🎨 Theming
@@ -75,8 +72,14 @@ ThemeData theme = Theme.of(context);
 
 // Use theme colors
 Color primaryColor = theme.colorScheme.primary;
-
 ```
+
+The theme configuration includes:
+- Color schemes for light and dark modes
+- Typography styles
+- Button themes
+- Input decoration themes
+- Card and dialog themes
 
 ## 📱 Responsive Design
 
@@ -89,9 +92,7 @@ Container(
   height: 20.h, // 20% of screen height
   child: Text('Responsive Container'),
 )
-
 ```
-
 ## 📦 Deployment
 
 Build the application for production:
@@ -102,17 +103,11 @@ flutter build apk --release
 
 # For iOS
 flutter build ios --release
-
 ```
 
 ## 🙏 Acknowledgments
+- Built with [Rocket.new](https://rocket.new)
+- Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
+- Styled with Material Design
 
-* Built with [Rocket.new](https://rocket.new)
-* Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
-* Styled with Material Design
-
-```
-
-*(Note: In your `pubspec.yaml` file, the internal project name is still listed as `taskflow_pro`. It is highly recommended to leave it like that for now, because changing it would require you to manually rename every single `import` link across all of your files!)*
-
-```
+Built with ❤️ on Rocket.new
